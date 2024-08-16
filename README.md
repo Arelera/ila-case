@@ -6,6 +6,12 @@ This project was scaffolded using [Vite.js](https://vitejs.dev/), and uses [Bun]
 
 ```shell
 bun install
+cp .env.example .env.local
+```
+
+Fill in the environment variables in the `.env.local` file.
+
+```shell
 bun dev
 ```
 
