@@ -1,11 +1,26 @@
-import { useAuth0 } from '@auth0/auth0-react'
-import LoginButton from './components/LoginButton'
-import LogoutButton from './components/LogoutButton'
+import { createBrowserRouter } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import DashboardPage from './pages/DashboardPage'
+import HomePage from './pages/HomePage'
+import RegisterPage from './pages/RegisterPage'
 
-function App() {
-  const { isAuthenticated } = useAuth0()
-
-  return <>{isAuthenticated ? <LogoutButton /> : <LoginButton />}</>
-}
-
-export default App
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomePage />,
+  },
+  {
+    element: <ProtectedRoute />,
+    path: '/',
+    children: [
+      {
+        path: '/register',
+        element: <RegisterPage />,
+      },
+      {
+        path: '/dashboard',
+        element: <DashboardPage />,
+      },
+    ],
+  },
+])
