@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
-import axios, { AxiosRequestConfig } from 'axios'
-
-const { VITE_API_BASE_URL } = import.meta.env
-axios.defaults.baseURL = VITE_API_BASE_URL
+import { AxiosRequestConfig } from 'axios'
+import { useEffect, useState } from 'react'
+import api from '../lib/api'
 
 /**
  * Fetch data from an API using Axios while handling the error, and loading states.
@@ -14,7 +12,7 @@ export default function useAxios<T>(axiosParams: AxiosRequestConfig) {
 
   const fetchData = async (params: AxiosRequestConfig) => {
     try {
-      const response = await axios.request(params)
+      const response = await api.request(params)
 
       setData(response.data as T)
     } catch (error) {
