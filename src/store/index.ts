@@ -1,11 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 import productsReducer from './productsSlice'
+import registerReducer from './registerSlice'
 
 export const store = configureStore({
   reducer: {
     products: productsReducer,
-    // TODO: add register form reducer
+    register: registerReducer,
   },
 })
 

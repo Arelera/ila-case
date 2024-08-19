@@ -1,23 +1,40 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import { useNavigate } from 'react-router-dom'
-import * as yup from 'yup'
 import MainLayout from '../layouts/MainLayout'
+import { useAppDispatch, useAppSelector } from '../store'
+import {
+  registerFormInitialValues,
+  registerFormSchema,
+  sendRegisterForm,
+  updateRegisterFormValues,
+} from '../store/registerSlice'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+  const { isLoading } = useAppSelector((state) => state.register)
 
   return (
     <MainLayout>
       Register Page
       <div>
         <Formik
-          initialValues={{ name: '', cv: '', resume: '' }}
-          validationSchema={schema}
-          onSubmit={() => {
+          initialValues={registerFormInitialValues}
+          validationSchema={registerFormSchema}
+          onSubmit={async () => {
+            await dispatch(sendRegisterForm())
             navigate('/dashboard')
           }}
         >
-          <Form>
+          <Form
+            onChange={(e: React.ChangeEvent<HTMLFormElement>) => {
+              dispatch(
+                updateRegisterFormValues({
+                  [e.target.name]: e.target.value as string,
+                })
+              )
+            }}
+          >
             <div>
               <label htmlFor="firstName">Name</label>
               <Field id="name" name="name" />
@@ -28,15 +45,12 @@ export default function RegisterPage() {
               <Field id="cv" name="cv" as="textarea" />
               <ErrorMessage name="cv" />
             </div>
-            <button type="submit">Register</button>
+            <button disabled={isLoading} type="submit">
+              Register
+            </button>
           </Form>
         </Formik>
       </div>
     </MainLayout>
   )
 }
-
-const schema = yup.object({
-  name: yup.string().required(),
-  cv: yup.string().required(),
-})
