@@ -1,50 +1,32 @@
 import { createColumnHelper } from '@tanstack/react-table'
-import Table from '../components/Table'
-import useAxios from '../hooks/useAxios'
-import MainLayout from '../layouts/MainLayout'
-import { Product } from '../types'
-import { Link } from 'react-router-dom'
-import api from '../lib/api'
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Table from '../components/Table'
+import MainLayout from '../layouts/MainLayout'
+import { useAppDispatch, useAppSelector } from '../store'
+import {
+  deleteProduct,
+  editProduct,
+  fetchProducts,
+} from '../store/productsSlice'
+import { Product } from '../types'
 
 export default function DashboardPage() {
-  const [products, setProducts] = useState<Product[]>([])
-  const { data, isLoading } = useAxios<Product[]>({
-    url: '/products',
-  })
+  const dispatch = useAppDispatch()
+  const {
+    data,
+    isLoading,
+    edit: { isLoading: isLoadingEdit },
+    delete: { isLoading: isLoadingDelete },
+  } = useAppSelector((state) => state.products)
 
   useEffect(() => {
-    if (data) setProducts(data)
-  }, [data])
+    dispatch(fetchProducts())
+  }, [])
 
   const [productInEdit, setProductInEdit] = useState<Product | null>(null)
   const editedProductRef = useRef<Partial<Product> | null>(null)
-
-  const editProduct = async (id: number, editedProduct: Partial<Product>) => {
-    if (!editedProduct) return
-    const res = await api.patch(`/products/${id}`, editedProduct)
-    if (res.status !== 200) {
-      alert('Failed to edit product')
-    } else {
-      const newProd = res.data as Product
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.id === id ? { ...product, ...newProd } : product
-        )
-      )
-      setProductInEdit(null)
-      editedProductRef.current = null
-    }
-  }
-
-  const deleteProduct = async (id: number) => {
-    const res = await api.delete(`/products/${id}`)
-    if (res.status !== 200) {
-      alert('Failed to delete product')
-    } else {
-      setProducts((prev) => prev.filter((product) => product.id !== id))
-    }
-  }
+  const [productInDelete, setProductInDelete] = useState<Product | null>(null)
 
   const columnHelper = createColumnHelper<Product>()
   const columns = [
@@ -120,15 +102,24 @@ export default function DashboardPage() {
           {productInEdit?.id === props.row.original.id ? (
             <>
               <button
-                onClick={() => {
-                  setProductInEdit(null)
-                  if (editedProductRef.current)
-                    editProduct(productInEdit.id, editedProductRef.current)
+                disabled={isLoadingEdit}
+                onClick={async () => {
+                  if (editedProductRef.current) {
+                    await dispatch(
+                      editProduct({
+                        ...productInEdit,
+                        ...(editedProductRef.current || {}),
+                      })
+                    )
+                    setProductInEdit(null)
+                    editedProductRef.current = null
+                  }
                 }}
               >
                 Save
               </button>
               <button
+                disabled={isLoadingEdit}
                 onClick={() => {
                   setProductInEdit(null)
                   editedProductRef.current = {}
@@ -146,7 +137,17 @@ export default function DashboardPage() {
               >
                 Edit
               </button>
-              <button onClick={() => deleteProduct(props.getValue())}>
+              <button
+                disabled={
+                  productInDelete?.id === props.row.original.id &&
+                  isLoadingDelete
+                }
+                onClick={async () => {
+                  setProductInDelete(props.row.original)
+                  await dispatch(deleteProduct(props.getValue()))
+                  setProductInDelete(null)
+                }}
+              >
                 Delete
               </button>
             </>
@@ -159,7 +160,7 @@ export default function DashboardPage() {
   return (
     <MainLayout>
       Dashboard Page
-      {!isLoading && products && <Table data={products} columns={columns} />}
+      {!isLoading && data && <Table data={data} columns={columns} />}
     </MainLayout>
   )
 }

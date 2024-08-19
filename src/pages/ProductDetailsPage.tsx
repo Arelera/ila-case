@@ -1,12 +1,19 @@
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import useAxios from '../hooks/useAxios'
 import MainLayout from '../layouts/MainLayout'
-import { Product } from '../types'
+import { useAppDispatch, useAppSelector } from '../store'
+import { fetchProductDetails } from '../store/productsSlice'
 
 export default function ProductDetailsPage() {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const { id } = useParams<{ id: string }>()
-  const { isLoading, data } = useAxios<Product>({ url: `/products/${id}` })
+
+  const { data, isLoading } = useAppSelector((state) => state.products.details)
+
+  useEffect(() => {
+    if (id) dispatch(fetchProductDetails(+id))
+  }, [])
 
   return (
     <MainLayout>
