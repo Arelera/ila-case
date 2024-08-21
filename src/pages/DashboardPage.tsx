@@ -61,6 +61,28 @@ export default function DashboardPage() {
         )
       },
     }),
+    columnHelper.accessor('description', {
+      header: 'Description',
+      cell: (props) => {
+        if (productInEdit?.id === props.row.original.id) {
+          return (
+            <textarea
+              className="form-control"
+              placeholder="Product description"
+              defaultValue={props.getValue()}
+              onChange={(e) => {
+                editedProductRef.current = {
+                  ...editedProductRef.current,
+                  description: e.target.value,
+                }
+              }}
+            />
+          )
+        }
+
+        return props.getValue()
+      },
+    }),
     columnHelper.accessor('price', {
       header: 'Price',
       cell: (props) => {
@@ -86,28 +108,6 @@ export default function DashboardPage() {
             {props.getValue()}
           </>
         )
-      },
-    }),
-    columnHelper.accessor('description', {
-      header: 'Description',
-      cell: (props) => {
-        if (productInEdit?.id === props.row.original.id) {
-          return (
-            <textarea
-              className="form-control"
-              placeholder="Product description"
-              defaultValue={props.getValue()}
-              onChange={(e) => {
-                editedProductRef.current = {
-                  ...editedProductRef.current,
-                  description: e.target.value,
-                }
-              }}
-            />
-          )
-        }
-
-        return props.getValue()
       },
     }),
     columnHelper.accessor('id', {
