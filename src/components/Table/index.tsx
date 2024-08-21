@@ -2,7 +2,6 @@ import {
   AccessorKeyColumnDef,
   flexRender,
   getCoreRowModel,
-  Header,
   Row,
   useReactTable,
 } from '@tanstack/react-table'
@@ -20,13 +19,20 @@ export default function Table<T>({ data, columns }: Props<T>) {
   })
 
   return (
-    <div className="p-2">
-      <table>
+    <div className="table-fixed overflow-scroll overflow-sm-hidden">
+      <table className="table align-items-center ">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHeader key={header.id} {...header} />
+                <th key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </th>
               ))}
             </tr>
           ))}
@@ -41,21 +47,15 @@ export default function Table<T>({ data, columns }: Props<T>) {
   )
 }
 
-function TableHeader(header: Header<any, unknown>) {
-  return (
-    <th key={header.id}>
-      {header.isPlaceholder
-        ? null
-        : flexRender(header.column.columnDef.header, header.getContext())}
-    </th>
-  )
-}
-
 function TableRow(row: Row<any>) {
   return (
     <tr>
       {row.getVisibleCells().map((cell) => (
-        <td key={cell.id}>
+        <td
+          key={cell.id}
+          className="text-sm px-3 overflow-hidden"
+          style={{ maxWidth: '1px' }}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}

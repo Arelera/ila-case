@@ -1,8 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Card from '../components/Card'
 import Table from '../components/Table'
-import MainLayout from '../layouts/MainLayout'
+import DashboardLayout from '../layouts/DashboardLayout'
 import { useAppDispatch, useAppSelector } from '../store'
 import {
   deleteProduct,
@@ -36,6 +37,8 @@ export default function DashboardPage() {
         if (productInEdit?.id === props.row.original.id) {
           return (
             <input
+              className="form-control"
+              placeholder="Product Name"
               key={props.row.original.id}
               type="text"
               defaultValue={props.getValue()}
@@ -61,6 +64,8 @@ export default function DashboardPage() {
         if (productInEdit?.id === props.row.original.id) {
           return (
             <input
+              className="form-control"
+              placeholder="Product price"
               type="number"
               defaultValue={props.getValue()}
               onChange={(e) => {
@@ -72,7 +77,12 @@ export default function DashboardPage() {
             />
           )
         }
-        return `$${props.getValue()}`
+        return (
+          <>
+            <span className="text-xs font-weight-bold">$</span>
+            {props.getValue()}
+          </>
+        )
       },
     }),
     columnHelper.accessor('description', {
@@ -81,6 +91,8 @@ export default function DashboardPage() {
         if (productInEdit?.id === props.row.original.id) {
           return (
             <textarea
+              className="form-control"
+              placeholder="Product description"
               defaultValue={props.getValue()}
               onChange={(e) => {
                 editedProductRef.current = {
@@ -96,12 +108,13 @@ export default function DashboardPage() {
       },
     }),
     columnHelper.accessor('id', {
-      header: 'Actions',
+      header: () => <div className="text-end">Actions</div>,
       cell: (props) => (
         <div>
           {productInEdit?.id === props.row.original.id ? (
-            <>
+            <div className="d-flex flex-md-row flex-column gap-2 justify-content-end">
               <button
+                className="btn btn-outline-secondary btn-xs m-0"
                 disabled={isLoadingEdit}
                 onClick={async () => {
                   if (editedProductRef.current) {
@@ -119,6 +132,7 @@ export default function DashboardPage() {
                 Save
               </button>
               <button
+                className="btn btn-outline-danger btn-xs m-0"
                 disabled={isLoadingEdit}
                 onClick={() => {
                   setProductInEdit(null)
@@ -127,10 +141,11 @@ export default function DashboardPage() {
               >
                 Cancel
               </button>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="d-flex flex-md-row flex-column gap-2 justify-content-end">
               <button
+                className="btn btn-outline-secondary btn-xs m-0"
                 onClick={() => {
                   setProductInEdit(props.row.original)
                 }}
@@ -138,6 +153,7 @@ export default function DashboardPage() {
                 Edit
               </button>
               <button
+                className="btn btn-outline-danger btn-xs m-0"
                 disabled={
                   productInDelete?.id === props.row.original.id &&
                   isLoadingDelete
@@ -150,7 +166,7 @@ export default function DashboardPage() {
               >
                 Delete
               </button>
-            </>
+            </div>
           )}
         </div>
       ),
@@ -158,9 +174,18 @@ export default function DashboardPage() {
   ]
 
   return (
-    <MainLayout>
+    <DashboardLayout
+      crumbs={[
+        { label: 'Home', href: '/' },
+        { label: 'Dashboard', href: '/dashboard' },
+      ]}
+    >
       Dashboard Page
-      {!isLoading && data && <Table data={data} columns={columns} />}
-    </MainLayout>
+      {!isLoading && data && (
+        <Card title="Products">
+          <Table data={data} columns={columns} />
+        </Card>
+      )}
+    </DashboardLayout>
   )
 }

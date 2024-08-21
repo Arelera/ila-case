@@ -1,5 +1,9 @@
-import MainLayout from '../layouts/MainLayout'
+import DashboardLayout from '../layouts/DashboardLayout'
 
 export default function HomePage() {
-  return <MainLayout>Home Page</MainLayout>
+  return (
+    <DashboardLayout crumbs={[{ label: 'Home', href: '/' }]}>
+      Home Page
+    </DashboardLayout>
+  )
 }
