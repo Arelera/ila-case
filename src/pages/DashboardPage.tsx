@@ -11,6 +11,7 @@ import {
   fetchProducts,
 } from '../store/productsSlice'
 import { Product } from '../types'
+import AddProductForm from '../components/AddProductForm'
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch()
@@ -28,6 +29,8 @@ export default function DashboardPage() {
   const [productInEdit, setProductInEdit] = useState<Product | null>(null)
   const editedProductRef = useRef<Partial<Product> | null>(null)
   const [productInDelete, setProductInDelete] = useState<Product | null>(null)
+
+  const [isAddingProduct, setIsAddingProduct] = useState(false)
 
   const columnHelper = createColumnHelper<Product>()
   const columns = [
@@ -180,9 +183,27 @@ export default function DashboardPage() {
         { label: 'Dashboard', href: '/dashboard' },
       ]}
     >
-      Dashboard Page
+      {isAddingProduct && (
+        <Card
+          title="Add Product"
+          className="col-xl-4 col-lg-5 col-md-7 mx-auto mt-4"
+        >
+          <AddProductForm hide={() => setIsAddingProduct(false)} />
+        </Card>
+      )}
       {!isLoading && data && (
-        <Card title="Products">
+        <Card
+          title="Products"
+          className="mt-4"
+          headerRight={
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setIsAddingProduct(true)}
+            >
+              Add Product
+            </button>
+          }
+        >
           <Table data={data} columns={columns} />
         </Card>
       )}

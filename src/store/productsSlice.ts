@@ -10,6 +10,7 @@ interface ProductsState {
   edit: { isLoading: boolean; error?: string }
   delete: { isLoading: boolean; error?: string }
   details: { isLoading: boolean; error?: string; data?: Product }
+  add: { isLoading: boolean; error?: string }
 }
 
 const initialState: ProductsState = {
@@ -19,6 +20,7 @@ const initialState: ProductsState = {
   edit: { isLoading: false, error: undefined },
   delete: { isLoading: false, error: undefined },
   details: { isLoading: false, error: undefined, data: undefined },
+  add: { isLoading: false, error: undefined },
 }
 
 export const fetchProducts = createAsyncThunk<AxiosResponse<Product[]>>(
@@ -38,6 +40,11 @@ export const deleteProduct = createAsyncThunk<void, Product['id']>(
   'products/delete',
   async (id) => await api.delete(`/products/${id}`)
 )
+
+export const addProduct = createAsyncThunk<
+  AxiosResponse<Product>,
+  Omit<Product, 'id' | 'rating'>
+>('products/add', async (data) => await api.post('/products', data))
 
 export const fetchProductDetails = createAsyncThunk<
   AxiosResponse<Product>,
@@ -86,6 +93,17 @@ export const productsSlice = createSlice({
       })
       .addCase(deleteProduct.rejected, (state) => {
         state.delete.isLoading = false
+      })
+
+      .addCase(addProduct.pending, (state) => {
+        state.add.isLoading = true
+      })
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.add.isLoading = false
+        state.data.unshift(action.payload.data)
+      })
+      .addCase(addProduct.rejected, (state) => {
+        state.add.isLoading = false
       })
 
       .addCase(fetchProductDetails.pending, (state) => {
