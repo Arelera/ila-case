@@ -7,7 +7,7 @@ export default function ProtectedRoute() {
   if (isLoading) return
   if (!isAuthenticated) {
     loginWithRedirect()
-    return
+    return 'Redirecting to login...'
   }
 
   return <Outlet />
