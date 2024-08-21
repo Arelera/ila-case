@@ -29,7 +29,7 @@ export default function ProductDetailsPage() {
       ]}
     >
       {!isLoading && product && (
-        <div className="row">
+        <div className="row mt-4">
           <div className="col-md-7">
             <Card>
               <Link
