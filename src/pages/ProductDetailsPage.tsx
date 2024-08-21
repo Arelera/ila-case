@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import Card from '../components/Card'
 import DashboardLayout from '../layouts/DashboardLayout'
 import { useAppDispatch, useAppSelector } from '../store'
 import { fetchProductDetails } from '../store/productsSlice'
-import Card from '../components/Card'
 
 export default function ProductDetailsPage() {
-  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { id } = useParams<{ id: string }>()
 
@@ -29,9 +28,6 @@ export default function ProductDetailsPage() {
         },
       ]}
     >
-      Product Details Page
-      <button onClick={() => navigate(-1)}>Back to Dashboard</button>
-      <div>Product ID: {id}</div>
       {!isLoading && product && (
         <div className="row">
           <div className="col-md-7">
@@ -46,7 +42,7 @@ export default function ProductDetailsPage() {
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="img-fluid h-"
+                  className="img-fluid"
                   style={{ maxHeight: '500px' }}
                 />
               </div>
